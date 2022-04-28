@@ -3,9 +3,19 @@ on: [push]
 jobs:
   semgrep:
     name: Scan
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     container:
       image: returntocorp/semgrep
+    # Skip any PR created by dependabot to avoid permission issues
+    if: (github.actor != 'dependabot[bot]')
     steps:
-    - uses: actions/checkout@v3
-    - run: semgrep ci
+      # Fetch project source
+      - uses: actions/checkout@v3
+
+      - run: semgrep ci
+        env:
+          # Select rules for your scan with one of these two options.
+          # Option 1: set hard-coded rulesets
+          SEMGREP_RULES: >- # more at semgrep.dev/r
+            p/security-audit
+            p/secrets
