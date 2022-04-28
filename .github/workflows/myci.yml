@@ -1,0 +1,36 @@
+name: Semgrep
+
+on:
+  # Scan changed files in PRs, block on new issues only (existing issues ignored)
+  pull_request: {}
+
+  # Scan all files on branches, block on any issues
+  # push:
+  #   branches: ["master", "main"]
+
+  # Schedule this job to run at a certain time, using cron syntax
+  # Note that * is a special character in YAML so you have to quote this string
+  # schedule:
+  #   - cron: '30 0 1,15 * *' # scheduled for 00:30 UTC on both the 1st and 15th of the month
+
+jobs:
+  semgrep:
+    name: Scan
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    # Skip any PR created by dependabot to avoid permission issues
+    if: (github.actor != 'dependabot[bot]')
+    steps:
+      # Fetch project source
+      - uses: actions/checkout@v3
+
+      - run: semgrep ci
+        env:
+          # Select rules for your scan with one of these two options.
+          # Option 1: set hard-coded rulesets
+          SEMGREP_RULES: >- # more at semgrep.dev/r
+            p/security-audit
+            p/secrets
+          # Option 2: scan with rules set in Semgrep App's rule board
+          # SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
