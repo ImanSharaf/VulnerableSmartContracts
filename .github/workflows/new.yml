@@ -1,0 +1,33 @@
+name: SASTnew
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  SAST_Scanning:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+      
+    - name: Run slither
+      uses: crytic/slither-action@v0.1.1
+      continue-on-error: true
+      with:
+        sarif: results.sarif
+    
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: results.sarif
+     
+    - name: Use the upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: result
+        path: results.sarif
