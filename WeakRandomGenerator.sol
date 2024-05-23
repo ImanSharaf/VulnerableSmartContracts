@@ -1,5 +1,4 @@
 pragma solidity ^0.8.0;
-//test
 
 contract VulnerableLottery{
     constructor() public payable {}
